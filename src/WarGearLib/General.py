@@ -673,6 +673,18 @@ class WGMap(object):
     '''
     self.DOM.getElementsByTagName("rules")[0].setAttribute("card_max_accrual",str(maxCards))
 
+def addBordersToSet(fromID, toIDs, direction='Two-way', 
+                type = "Default", ftattackmod = "0",
+                ftdefendmod="0", tfattackmod="0",
+                tfdefendmod="0", ftattackmin="0",
+                ftdefendmin="0", tfattackmin="0", 
+                tfdefendmin="0"):
+  for toID in toIDs:
+    addBorder(fromID,toID,direction, type, ftattackmod,
+                ftdefendmod, tfattackmod, tfdefendmod, ftattackmin,
+                ftdefendmin, tfattackmin,tfdefendmin) 
+         
+     
   def addBorders(self,fromRegex,toRegex, direction = "Two-way", 
                 type = "Default", ftattackmod = "0",
                 ftdefendmod="0", tfattackmod="0",
