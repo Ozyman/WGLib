@@ -510,6 +510,29 @@ class WGMap(object):
     print "found neighbors",neighbors
     return neighbors
 
+
+  def getTerritoryIDsByDistance(self, baseID, distance):
+
+    returnSet = set()
+
+    latestNeighbors = set()
+    latestNeighbors.add(baseID)
+    newNeighbors = set()
+
+    d = 0
+    while (d < distance):
+
+      for id in latestNeighbors:   
+        newNeighbors |= self.getNeighborIDsFromID(self, id)
+ 
+      returnSet |= latestNeighbors
+      latestNeighbors.clear()
+      latestNeighbors |= newNeighbors
+      newNeighbors.clear()
+      d += 1
+
+    return returnSet
+
   # todo: cache this?
   
   def getBorderCount(self, territoryID):
@@ -673,19 +696,19 @@ class WGMap(object):
     '''
     self.DOM.getElementsByTagName("rules")[0].setAttribute("card_max_accrual",str(maxCards))
 
-def addBordersToSet(fromID, toIDs, direction='Two-way', 
+  def addBordersToSet(self, fromID, toIDs, direction='Two-way', 
                 type = "Default", ftattackmod = "0",
                 ftdefendmod="0", tfattackmod="0",
                 tfdefendmod="0", ftattackmin="0",
                 ftdefendmin="0", tfattackmin="0", 
                 tfdefendmin="0"):
-  for toID in toIDs:
-    addBorder(fromID,toID,direction, type, ftattackmod,
+    for toID in toIDs:
+      self.addBorder(fromID,toID,direction, type, ftattackmod,
                 ftdefendmod, tfattackmod, tfdefendmod, ftattackmin,
                 ftdefendmin, tfattackmin,tfdefendmin) 
          
      
-  def addBorders(self,fromRegex,toRegex, direction = "Two-way", 
+  def addBordersViaRegex(self,fromRegex,toRegex, direction = "Two-way", 
                 type = "Default", ftattackmod = "0",
                 ftdefendmod="0", tfattackmod="0",
                 tfdefendmod="0", ftattackmin="0",
@@ -1006,7 +1029,7 @@ def addBordersToSet(fromID, toIDs, direction='Two-way',
         #print "border found",ID1,ID2
         return True
       if (fromID == ID2 and toID == ID1):
-       # print "border found",ID1,ID2
+        # print "border found",ID1,ID2
         return True
       
     #print "border not found"
@@ -1329,7 +1352,7 @@ class SquareGridWGMap(WGMap):
     #            defenseBonus.str())
     
     
-  def addBorders(self, ULRC, LRRC):
+  def addBordersViaRegex(self, ULRC, LRRC):
     '''
     ULRC - Upper Left Row Column
     LRRC - Lower Right Row Column
@@ -1826,7 +1849,7 @@ class KnightWGMap(SquareGridWGMap):
   gain bonuses for 4-squares & borders are connected
   like a knight moves in chess.
   """
-  def addBorders(self):
+  def addBordersViaRegex(self):
     '''
     Adds borders as a knight could attack for a grid created 
     by :func:`SquareGridWGMap.createTerritories.
@@ -1871,7 +1894,7 @@ class KnightWGMap(SquareGridWGMap):
     #self.setBoardName("Knight's Tour (" + str(rows) + "x" + str(cols) + ")")
     
     self.createTerritories(xOrigin, yOrigin, rowHeight, colWidth)   
-    self.addBorders()
+    self.addBordersViaRegex()
     self.createBlockContinents(1)
 
     print "Deleting Territories",
@@ -2008,7 +2031,7 @@ class KnightWGMap(SquareGridWGMap):
       return -1;
     
     self.createTerritories(xOrigin, yOrigin, rowHeight, colWidth)   
-    self.addBorders()
+    self.addBordersViaRegex()
     self.createBlockContinents(1)
 
     print "Deleting Territories",
@@ -2123,7 +2146,7 @@ class KnightWGMap(SquareGridWGMap):
     #self.printDOM()
 
     self.createTerritories(xOrigin, yOrigin, rowHeight, colWidth)   
-    self.addBorders()
+    self.addBordersViaRegex()
     self.createBlockContinents(1)
 
     print "Deleting Territories",
@@ -2479,7 +2502,7 @@ def addDnDGridTerritories():
   ULCR = (0,0)
   LRCR = (24,41)
   wgmap.createTerritories(1*25+25/2,7*25+25/2,25,25)
-  wgmap.addBorders(ULCR,LRCR)
+  wgmap.addBordersViaRegex(ULCR,LRCR)
   wgmap.saveMapToFile('//BHO/data/wargear development/Dungeons & Dragons/Dungeons & Dragons.out.xml')
 
 def addDnDPCBorders():
@@ -2612,7 +2635,7 @@ def addDnDRodContinents():
 def addQbertViewTerritories():
   wgmap = WGMap()
   wgmap.loadMapFromFile('//BHO/data/wargear development/qbert/qbert.xml')
-  wgmap.addBorders("Disk","^[1234567890]*$","One-way","View Only")
+  wgmap.addBordersViaRegex("Disk","^[1234567890]*$","One-way","View Only")
   wgmap.saveMapToFile('//BHO/data/wargear development/qbert/qbertOut.xml')
 
 def addBackForMoreDiceContinents():
